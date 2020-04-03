@@ -1,1 +1,54 @@
+local humanoid = script.Parent.Humanoid
+local torso = script.Parent.HumanoidRootPart
+local ps = game:GetService("PathfindingService")
 
+math.randomseed(tick())--create a seed
+
+while true do
+	local pos = torso.CFrame.Position + Vector3.new(math.random(-50,50),0,math.random(-50,50))--100x100 square radius
+	local path = ps:CreatePath({AgentHeight = 1, AgentRadius = 1})
+	local comp = path:ComputerAsync(torso.CFrame.Position, pos)
+	
+	if path.Status == Enum.PathStatus.Success then
+		local waypoints = path:GetWaypoints()
+		
+		humanoid.Seated:Connect(function(seated)
+			if seated == true then
+				print("seated")
+				humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+			end
+		end)
+		
+		path.Blocked:Connect(function()
+			print("blocked!")
+			humanoid:MoveTo(torso.CFrame.Position)
+		end)
+		
+		for _,point in pairs(waypoints) do
+			humanoid:MoveTo(point.Position)
+			--this is just a demonstration of where the point is, you can remove it--
+			local part = Instance.new("Part")
+			
+			part.CanCollide = false
+			part.Locked = true
+			part.Anchored = true
+			part.Material = Enum.Material.Neon
+			part.BrickColor = BrickColor.Red()
+			part.Size = Vector3.new(1,0.5,1)
+			part.CFrame = CFrame.new(point.Position)
+			part.Transparency = 0.25
+			part.Parent = workspace
+			
+			if point.Action == Enum.PathWaypointAction.Jump then
+				print("jumping")
+				humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+			end
+			
+			humanoid.MoveToFinished:Wait()
+			
+			part.Destroy()
+		end
+	end
+	
+	wait(math.random(2,3.5))
+end
