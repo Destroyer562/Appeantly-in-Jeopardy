@@ -1,1 +1,11 @@
+local char = script.Parent
+local healthGUI = char.Head["Health GUI"]
+local Zombie = char.Zombie
+
+Zombie:GetPropertyChangedSignal("Health"):Connect(function()
+	local healthChange = Zombie.Health/Zombie.MaxHealth
+	local healthColor = Color3.fromRGB(255,0,0):Lerp(Color3.fromRGB(60,255,0),healthChange)
+	healthGUI.Health.Meter:TweenSize(UDim2.new(healthChange,0,1,0),"In","Linear",1)
+	healthGUI.Health.Meter.BackgroundColor3 = healthColor
+end)
 
