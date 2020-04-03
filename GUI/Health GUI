@@ -1,1 +1,8 @@
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:wait()
+local Human = Character:WaitForChild("Humanoid")
+local HealthFrame = script.Parent
 
+Human.HealthChanged:Connect(function(Health)
+	HealthFrame.Size = UDim2.new(Health/Human.MaxHealth,0,1,0)
+end)
